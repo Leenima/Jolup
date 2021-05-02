@@ -3,8 +3,10 @@ const mysql = require('mysql')
 const bodyParser = require('body-parser')
 
 
-const app = express()
-const port = 3000
+const port = 3000;
+
+var app = express();
+app.use(express.json())
 
 // mysql connection 생성// mysql connection 생성
 const connection = mysql.createConnection({
@@ -33,7 +35,7 @@ app.get('/getUserData', (req, res) => { // getUserData 경로에 GET 요청이 �
         });
 })
 
-// 하 왜 안되는거지
+//근데 아니 하 왜 안되는거지 화나네
 app.post('/setUserData', (req, res) => {
     console.log(req.body);
     console.log(`body : ${JSON.stringify(req.body)}`)
