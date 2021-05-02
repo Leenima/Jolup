@@ -1,6 +1,4 @@
 const express = require('express')
-    // dbconnection.js 파일 import
-    // const connection = require('./dbconnection')
 const mysql = require('mysql')
 const bodyParser = require('body-parser')
 
@@ -16,7 +14,6 @@ const connection = mysql.createConnection({
     database: 'jolup'
 });
 
-// dbconnection.js 에서 connection 을 생성후 connection 변수를 export 하였기 때문에 바로 connect 함수에 접근이 가능하다.
 connection.connect(function(err) {
     if (err) throw err;
     connection.query("SELECT * FROM jolup.privacy", function(err, result, fields) {
@@ -25,6 +22,7 @@ connection.connect(function(err) {
     });
 })
 
+//get은 보안상의 문제로 안쓰는게 좋다고 생각중 그래서 post로 하려고 시도중
 app.get('/getUserData', (req, res) => { // getUserData 경로에 GET 요청이 왔을 경우
     console.log(`param id : ${req.query.id}`)
     connection.query(
@@ -35,13 +33,14 @@ app.get('/getUserData', (req, res) => { // getUserData 경로에 GET 요청이 �
         });
 })
 
-// [POST 요청 예제] /setUserData?
+// 하 왜 안되는거지
 app.post('/setUserData', (req, res) => {
     console.log(req.body);
     console.log(`body : ${JSON.stringify(req.body)}`)
     connection.query(
         // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-        "INSERT INTO jolup.privacy ('id', 'name', 'password') VALUES ('${req.body.id}', '${req.body.name}', `${req.body.password}`);",
+        `INSERT INTO jolup.privacy ('id', 'name', 'password', 'live_code', 'admin') VALUES ("${req.body.id}", "${req.body.name}", "${req.body.password}", 0, 0);`,
+        //"INSERT INTO jolup.privacy (`name`, `id`, `password`, `live_code`, `admin`) VALUES ('김성우', 'voicemaker', 'aas212', 0, 0)";
         (err, rows, fields) => {
             if (err) { // sql 문 에러 발생 시, error 전송
                 res.status(300).send({
