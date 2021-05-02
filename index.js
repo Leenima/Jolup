@@ -1,6 +1,5 @@
 const express = require('express')
 const mysql = require('mysql')
-const bodyParser = require('body-parser')
 
 
 const port = 3000;
@@ -41,14 +40,17 @@ app.post('/setUserData', (req, res) => {
     console.log(`body : ${JSON.stringify(req.body)}`)
     connection.query(
         // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-        `INSERT INTO jolup.privacy ('id', 'name', 'password', 'live_code', 'admin') VALUES ("${req.body.id}", "${req.body.name}", "${req.body.password}", 0, 0);`,
-        //"INSERT INTO jolup.privacy (`name`, `id`, `password`, `live_code`, `admin`) VALUES ('김성우', 'voicemaker', 'aas212', 0, 0)";
+        //`INSERT INTO jolup.privacy ('id', 'name', 'password', 'live_code', 'admin') VALUES ('${req.body.id}', '${req.body.name}', '${req.body.password}', 0, 0);`,
+        //'INSERT INTO jolup.privacy (`id`, `name`, `password`, `live_code`, `admin`) VALUES ("${req.body.id}", "${req.body.name}", "${req.body.password}", 0, 0);',
+        `INSERT INTO jolup.privacy VALUES (null, '${req.body.id}', '${req.body.name}', '${req.body.password}', 0, 0);`,
         (err, rows, fields) => {
             if (err) { // sql 문 에러 발생 시, error 전송
                 res.status(300).send({
                     state: "ERROR",
                     message: err.sqlMessage
                 });
+                console.log("에러 발생");
+                console.log(err.sqlMessage);
             } else { // success 전송
                 res.status(200).send({
                     state: "OK",
