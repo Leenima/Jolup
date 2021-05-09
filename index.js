@@ -100,34 +100,7 @@ app.post('/double_check', (req, res) => {
     );
 })
 
-/*
-//회원 가입
-app.post('/setUserMaxid', (req, res) => {
-    console.log(req.body);
-    console.log(`body : ${JSON.stringify(req.body)}`)
-    connection.query(
-        // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-        `INSERT INTO jolup.privacy VALUES (null, '${req.body.id}', '${req.body.name}', '${req.body.password}', 0, 0);`,
-        (err, rows, fields) => {
-            if (err) { // sql 문 에러 발생 시, error 전송
-                res.status(300).send({
-                    state: "ERROR",
-                    message: err.sqlMessage
-                });
-                console.log("에러 발생");
-                console.log(err.sqlMessage);
-            } else { // success 전송
-                res.status(200).send({
-                    state: "OK",
-                    message: "Data insert success!"
-                });
-            }
-        });
-})
 
-*/
-// database 연결 종료
-//connection.end();
 
 app.listen(port, () => {
     console.log(`Example app listening at http://lockup.kro.kr:${port}`)
