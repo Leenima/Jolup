@@ -68,9 +68,13 @@ app.post('/setUserData', (req, res) => {
 
 //중복확인
 app.post('/double_check', (req, res) => {
+    console.log(req.body);
+    console.log(`body : ${JSON.stringify(req.body)}`)
+    console.log(`${req.body.id}`)
     connection.query(
         // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-        `SELECT * FROM jolup.privacy WHERE id = ${req.query.id};`,
+        //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
+        `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}';`,
         (err, rows, fields) => {
             if (err) { // sql 문 에러 발생 시, error 전송
                 res.status(300).send({
@@ -93,8 +97,9 @@ app.post('/double_check', (req, res) => {
                 }*/
                 res.status(200).send({
                     state: "OK",
-                    message: "일단 확인"
+                    message: "TEST 확인"
                 });
+                console.log(rows);
             }
         }
     );
