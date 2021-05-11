@@ -76,6 +76,8 @@ app.post('/double_check', (req, res) => {
         //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
         `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}';`,
         (err, rows, fields) => {
+            //console.log(rows[0].cnt);
+            //console.log(rows[0]['cnt']);
             if (err) { // sql 문 에러 발생 시, error 전송
                 res.status(300).send({
                     state: "ERROR",
@@ -84,22 +86,19 @@ app.post('/double_check', (req, res) => {
                 console.log("에러 발생");
                 console.log(err.sqlMessage);
             } else { // success 전송
-                /*if (rows == req.query.id) {
-                    res.status(200).send({
+                if (rows[0].cnt >= 1) {
+                    res.status(204).send({
                         state: "OK",
-                        message: "중복되는 아이디입니다."
+                        message: "중복되는 아이디입니다.",
+                        code: 204
                     });
                 } else {
                     res.status(200).send({
                         state: "OK",
-                        message: "중복되지 않는 아이디입니다."
+                        message: "중복되지 않는 아이디입니다.",
+                        code: 200
                     });
-                }*/
-                res.status(200).send({
-                    state: "OK",
-                    message: "TEST 확인"
-                });
-                console.log(rows);
+                }
             }
         }
     );
