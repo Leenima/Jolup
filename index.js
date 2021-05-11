@@ -47,7 +47,7 @@ app.post('/setUserData', (req, res) => {
     console.log(`body : ${JSON.stringify(req.body)}`)
     connection.query(
         // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-        `INSERT INTO jolup.privacy VALUES (null, '${req.body.id}', '${req.body.name}', '${req.body.password}', 0, 0);`,
+        `INSERT INTO jolup.privacy VALUES (null, '${req.body.name}', '${req.body.id}', '${req.body.password}', 0, 0);`,
         (err, rows, fields) => {
             if (err) { // sql 문 에러 발생 시, error 전송
                 res.status(300).send({
@@ -59,7 +59,8 @@ app.post('/setUserData', (req, res) => {
             } else { // success 전송
                 res.status(200).send({
                     state: "OK",
-                    message: "회원가입에 성공하셨습니다!"
+                    message: "회원가입에 성공하셨습니다!",
+                    code: 200
                 });
             }
         }
@@ -86,11 +87,12 @@ app.post('/double_check', (req, res) => {
                 console.log("에러 발생");
                 console.log(err.sqlMessage);
             } else { // success 전송
-                if (rows[0].cnt >= 1) {
-                    res.status(204).send({
+                console.log(rows[0].cnt);
+                if (rows[0].cnt != 0) {
+                    res.status(201).send({
                         state: "OK",
                         message: "중복되는 아이디입니다.",
-                        code: 204
+                        code: 201
                     });
                 } else {
                     res.status(200).send({
