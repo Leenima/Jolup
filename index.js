@@ -43,6 +43,7 @@ app.get('/getUserData', (req, res) => { // getUserData 경로에 GET 요청이 �
 })
 
 //회원 가입
+/*
 app.post('/setUserData', (req, res) => {
     console.log(req.body);
     console.log(`body : ${JSON.stringify(req.body)}`)
@@ -67,66 +68,49 @@ app.post('/setUserData', (req, res) => {
         }
     );
 })
+*/
+app.post('/setUserData', async(req, res) => {
+    console.log(req.body);
+    console.log(`body : ${JSON.stringify(req.body)}`)
+    try {
+        await connection.query(
+            // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다. 
+            `INSERT INTO jolup.privacy VALUES (null, '${req.body.name}', '${req.body.id}', '${req.body.password}', 0, '${req.body.admin}');`,
+            (err, rows, fields) => {
+                console.log(rows);
+                console.log(fields);
+            }
+        );
+        res.status(200).send({
+            state: "OK",
+            message: "회원가입에 성공하셨습니다!",
+            code: 200
+        });
+    } catch (error) {
+        res.status(300).send({
+            state: "ERROR",
+            message: err.sqlMessage
+        }); -
+        console.log("에러 발생");
+        console.log(error);
+    }
+})
+
+
 
 //중복확인
 app.post('/double_check', (req, res) => {
-    console.log(req.body);
-    console.log(`body : ${JSON.stringify(req.body)}`)
-    console.log(`${req.body.id}`)
-    connection.query(
-        // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-        //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
-        `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}';`,
-        (err, rows, fields) => {
-            //console.log(rows[0].cnt);
-            //console.log(rows[0]['cnt']);
-            if (err) { // sql 문 에러 발생 시, error 전송
-                res.status(300).send({
-                    state: "ERROR",
-                    message: err.sqlMessage
-                });
-                console.log("에러 발생");
-                console.log(err.sqlMessage);
-            } else { // success 전송
-                console.log(rows[0].cnt);
-                if (rows[0].cnt != 0) {
-                    res.status(201).send({
-                        state: "OK",
-                        message: "중복되는 ID입니다.",
-                        code: 201
-                    });
-                } else {
-                    res.status(200).send({
-                        state: "OK",
-                        message: "사용 가능한 ID입니다.",
-                        code: 200
-                    });
-                }
-            }
-        }
-    );
-})
-
-//로그인
-app.post('/login', (req, res) => {
-    var id_ = 0;
-    var query_stop = 0;
-    console.log(req.body);
-    console.log(`body : ${JSON.stringify(req.body)}`)
-    console.log(`${req.body.id}`)
-
-    if (id_ == 0) {
-        query_step = 1;
-        connection.query( // id가 존재하는지?
+        console.log(req.body);
+        console.log(`body : ${JSON.stringify(req.body)}`)
+        console.log(`${req.body.id}`)
+        connection.query(
             // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
             //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
             `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}';`,
             (err, rows, fields) => {
-                query_step = 1;
                 //console.log(rows[0].cnt);
                 //console.log(rows[0]['cnt']);
                 if (err) { // sql 문 에러 발생 시, error 전송
-                    query_stop = 1;
                     res.status(300).send({
                         state: "ERROR",
                         message: err.sqlMessage
@@ -135,81 +119,199 @@ app.post('/login', (req, res) => {
                     console.log(err.sqlMessage);
                 } else { // success 전송
                     console.log(rows[0].cnt);
+                    if (rows[0].cnt != 0) {
+                        res.status(201).send({
+                            state: "OK",
+                            message: "중복되는 ID입니다.",
+                            code: 201
+                        });
+                    } else {
+                        res.status(200).send({
+                            state: "OK",
+                            message: "사용 가능한 ID입니다.",
+                            code: 200
+                        });
+                    }
+                }
+            }
+        );
+    })
+    /*
+    //로그인
+    app.post('/login', (req, res) => {
+        var query_stop = 0;
+        console.log(req.body);
+        console.log(`body : ${JSON.stringify(req.body)}`)
+        console.log(`${req.body.id}`)
+
+        if (id_ == 0) {
+            query_step = 1;
+            connection.query( // id가 존재하는지?
+                // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
+                //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
+                `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}';`,
+                (err, rows, fields) => {
+                    query_step = 1;
+                    //console.log(rows[0].cnt);
+                    //console.log(rows[0]['cnt']);
+                    if (err) { // sql 문 에러 발생 시, error 전송
+                        query_stop = 1;
+                        res.status(300).send({
+                            state: "ERROR",
+                            message: err.sqlMessage
+                        });
+                        console.log("에러 발생");
+                        console.log(err.sqlMessage);
+                    } else { // success 전송
+                        console.log(rows[0].cnt);
+                        if (rows[0].cnt != 0) { //id가 존재한다면.
+                            id_ = 1;
+                        } else {
+                            query_stop = 1;
+                            res.status(201).send({
+                                state: "OK",
+                                message: "ID가 존재하지 않습니다",
+                                code: 201
+                            });
+                        }
+                    }
+                    console.log("아이디 맞음?: " + id_);
+                }
+            );
+        } else if (id_ == 1) { //id가 존재한다면 id와 패스워드까지 같은게 존재하는지 확인
+            connection.query(
+                // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
+                //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
+                `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}', password='${req.body.password}';`,
+                (err, rows, fields) => {
+                    query_step = 2;
+                    //console.log(rows[0].cnt);
+                    //console.log(rows[0]['cnt']);
+                    if (err) { // sql 문 에러 발생 시, error 전송
+                        res.status(300).send({
+                            state: "ERROR",
+                            message: err.sqlMessage
+                        });
+                        console.log("에러 발생");
+                        console.log(err.sqlMessage);
+                    } else { // success 전송
+                        console.log(rows[0].cnt);
+                        if (rows[0].cnt != 0) { //패스워드까지 맞는 id가 존재한다면.
+                            id_ = 2;
+                        } else {
+                            query_stop = 1;
+                            res.status(201).send({
+                                state: "OK",
+                                message: "패스워드가 일치하지 않습니다",
+                                code: 201
+                            });
+                        }
+                        console.log("패스워드 맞음?: " + id_);
+                    }
+                }
+            );
+        }
+        if (id_ == 2) { //패스워드가 같은 id가 존재한다면 그 유저값을 보내준다
+            connection.query(
+                // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
+                //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
+                `SELECT * FROM jolup.privacy WHERE id='${req.body.id}', password='${req.body.password}';`,
+                (err, rows, fields) => {
+                    query_step = 3;
+                    //console.log(rows[0].cnt);
+                    //console.log(rows[0]['cnt']);
+                    if (err) { // sql 문 에러 발생 시, error 전송
+                        query_stop = 1;
+                        res.status(300).send({
+                            state: "ERROR",
+                            message: err.sqlMessage
+                        });
+                        console.log("에러 발생");
+                        console.log(err.sqlMessage);
+                    } else { // success 전송
+                        query_stop = 1;
+                        res.status(201).send({
+                            state: "OK",
+                            message: rows[0].name + "님 어서오세요.",
+                            code: 201
+                        });
+                    }
+                }
+            );
+        }
+    })
+    */
+
+//로그인
+app.post('/login', async(req, res) => {
+    var id_ = 0;
+    try {
+        await connection.query(
+                `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}';`,
+                (err, rows, fields) => {
+                    console.log(rows[0].cnt);
                     if (rows[0].cnt != 0) { //id가 존재한다면.
+                        console.log("id가 존재합니다");
                         id_ = 1;
                     } else {
-                        query_stop = 1;
+                        console.log("id가 존재하지 않습니다");
                         res.status(201).send({
                             state: "OK",
                             message: "ID가 존재하지 않습니다",
                             code: 201
                         });
+                        throw 1;
                     }
                 }
-                console.log("아이디 맞음?: " + id_);
-            }
-        );
-    } else if (id_ == 1) { //id가 존재한다면 id와 패스워드까지 같은게 존재하는지 확인
-        connection.query(
-            // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
-            //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
-            `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}', password='${req.body.password}';`,
-            (err, rows, fields) => {
-                query_step = 2;
-                //console.log(rows[0].cnt);
-                //console.log(rows[0]['cnt']);
-                if (err) { // sql 문 에러 발생 시, error 전송
-                    res.status(300).send({
-                        state: "ERROR",
-                        message: err.sqlMessage
-                    });
-                    console.log("에러 발생");
-                    console.log(err.sqlMessage);
-                } else { // success 전송
-                    console.log(rows[0].cnt);
+            ) // query A
+        await connection.query(
+                `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE id='${req.body.id}' and password='${req.body.password}';`,
+                (err, rows, fields) => {
+                    console.log("2번 쿼리");
+                    console.log(rows);
                     if (rows[0].cnt != 0) { //패스워드까지 맞는 id가 존재한다면.
+                        console.log("패스워드가 맞습니다");
                         id_ = 2;
                     } else {
-                        query_stop = 1;
                         res.status(201).send({
                             state: "OK",
                             message: "패스워드가 일치하지 않습니다",
                             code: 201
                         });
+                        throw 2;
                     }
                     console.log("패스워드 맞음?: " + id_);
                 }
-            }
-        );
-    }
-    if (id_ == 2) { //패스워드가 같은 id가 존재한다면 그 유저값을 보내준다
-        connection.query(
+            ) // query B
+
+        await connection.query(
             // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
             //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
             `SELECT * FROM jolup.privacy WHERE id='${req.body.id}', password='${req.body.password}';`,
             (err, rows, fields) => {
-                query_step = 3;
-                //console.log(rows[0].cnt);
-                //console.log(rows[0]['cnt']);
-                if (err) { // sql 문 에러 발생 시, error 전송
-                    query_stop = 1;
-                    res.status(300).send({
-                        state: "ERROR",
-                        message: err.sqlMessage
-                    });
-                    console.log("에러 발생");
-                    console.log(err.sqlMessage);
-                } else { // success 전송
-                    query_stop = 1;
-                    res.status(201).send({
-                        state: "OK",
-                        message: rows[0].name + "님 어서오세요.",
-                        code: 201
-                    });
-                }
+                res.status(201).send({
+                    state: "OK",
+                    message: rows[0].name + "님 어서오세요.",
+                    code: 201
+                });
             }
         );
+
+    } catch (error) {
+        if (error == 1) {
+            console.log("아이디가 존재하지 않음");
+        } else if (error == 2) {
+            console.log("패스워드가 틀림");
+        } else {
+            res.status(300).send({
+                state: "ERROR",
+                message: err.sqlMessage
+            });
+            console.log("에러 발생");
+            console.log(err.sqlMessage);
+        }
     }
+
 })
 
 app.listen(port, () => {
