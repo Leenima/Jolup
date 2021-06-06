@@ -219,7 +219,7 @@ app.post('/login', async(req, res) => {
     }
 })
 
-//호스트 메뉴 - 게스트 목록
+//호스트 메뉴 - 게스트 목록 
 app.post('/guest_list', async(req, res) => {
     var admin_code = 0;
     var q = 0;
