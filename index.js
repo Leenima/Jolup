@@ -221,8 +221,8 @@ app.post('/login', async(req, res) => {
 
 //호스트 메뉴 - 게스트 목록 
 app.post('/guest_list', async(req, res) => {
-    var admin_code = 0;
     var q = 0;
+    var rows2;
     console.log(req.body);
     console.log(`body : ${JSON.stringify(req.body)}`)
     try {
@@ -235,10 +235,11 @@ app.post('/guest_list', async(req, res) => {
                 console.log(rows);
                 admin_code = rows[0].user_id
                 console.log("호스트의 유저아이디: " + rows[0].user_id);
+                rows2 = rows
             }
         );
         await connection.query(
-            `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE live_code=` + admin_code + `;`,
+            `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE live_code=` + rows2[0].user_id + `;`,
             (err, rows, fields) => {
                 while (admin_code == 0) {};
                 console.log("cnt: " + rows[0].cnt);
@@ -259,10 +260,9 @@ app.post('/guest_list', async(req, res) => {
         await connection.query(
             // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
             //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
-            `SELECT * FROM jolup.privacy WHERE live_code=` + admin_code + `;`,
+            `SELECT * FROM jolup.privacy WHERE live_code=` + rows2[0].user_id + `;`,
             (err, rows, fields) => {
-                while (admin_code == 0) {};
-                console.log("admin code:" + admin_code);
+                console.log("2admin code:" + rows2[0].user_id);
                 if (q == 0) {
                     console.log(rows);
                     res.status(200).json({
