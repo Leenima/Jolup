@@ -219,6 +219,7 @@ app.post('/login', async(req, res) => {
     }
 })
 
+        /*
 //호스트 메뉴 - 게스트 목록 
 app.post('/guest_list', async(req, res) => {
     var q = 0;
@@ -226,6 +227,83 @@ app.post('/guest_list', async(req, res) => {
     console.log(req.body);
     console.log(`body : ${JSON.stringify(req.body)}`)
     try {
+
+        var userInfo = {
+        };
+          function guest_list1() {
+            return new Promise({
+                await connection.query(
+                    // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
+                    //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
+                    `SELECT * FROM jolup.privacy WHERE id='${req.body.id}';`,
+                    (err, rows, fields) => {
+                        console.log("q: " + q);
+                        console.log(rows);
+                        admin_code = rows[0].user_id
+                        console.log("호스트의 유저아이디: " + rows[0].user_id);
+                        rows2 = rows
+                    }
+                );
+            });
+          }
+          function guest_list2() {
+            return new Promise({
+                await connection.query(
+                    `SELECT COUNT(id) AS cnt FROM jolup.privacy WHERE live_code=` + rows2[0].user_id + `;`,
+                    (err, rows, fields) => {
+                        while (admin_code == 0) {};
+                        console.log("cnt: " + rows[0].cnt);
+                        console.log("q: " + q);
+                        if (rows[0].cnt != 0) { //id가 존재한다면.
+                            console.log("게스트가 있습니다");
+                        } else {
+                            q = 1;
+                            console.log("게스트가 없습니다");
+                            res.status(200).send({
+                                state: "OK",
+                                message: "게스트가 존재하지 않습니다",
+                                code: 200
+                            });
+                        }
+                    }
+                ); // query A
+            });
+          }
+          function guest_list3() {
+            return new Promise({
+               await connection.query(
+                    // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
+                    //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
+                    `SELECT * FROM jolup.privacy WHERE live_code=` + rows2[0].user_id + `;`,
+                    (err, rows, fields) => {
+                        console.log("2admin code:" + rows2[0].user_id);
+                        if (q == 0) {
+                            console.log(rows);
+                            res.status(200).json({
+                                state: "OK",
+                                message: "게스트를 성공적으로 불러왔습니다.",
+                                code: 200,
+                                items: [{
+                                    guest: rows
+                                }]
+                            })
+                        }
+                    }
+                );
+            });
+        }
+
+
+
+
+
+        getData(userInfo)
+        .then(parseValue)
+        .then(auth);
+
+
+
+
         await connection.query(
             // 쿼리 문 작성 시 리터럴 함수를 사용하더라도 '' string 표시는 꼭! 해주어야 한다.
             //`SELECT * FROM jolup.privacy WHERE id = ${req.body.id};`,
@@ -287,6 +365,7 @@ app.post('/guest_list', async(req, res) => {
     }
 
 })
+*/
 
 app.listen(port, () => {
     console.log(`Example app listening at http://lockup.kro.kr:${port}`)
